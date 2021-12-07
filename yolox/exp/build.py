@@ -10,6 +10,7 @@ import sys
 def get_exp_by_file(exp_file):
     try:
         sys.path.append(os.path.dirname(exp_file))
+        # importlib.import_module(name=可以是字符串)
         current_exp = importlib.import_module(os.path.basename(exp_file).split(".")[0])
         exp = current_exp.Exp()
     except Exception:
@@ -19,6 +20,8 @@ def get_exp_by_file(exp_file):
 
 def get_exp_by_name(exp_name):
     import yolox
+    # yolox.__file__:/home/liuhongyu/Projects/YOLOX/yolox/__init__.py
+    # 文件夹后面接.__file__，得到***/__init__.py；如果是py文件后面接.__file__，就得到该py文件的绝对路径
     yolox_path = os.path.dirname(os.path.dirname(yolox.__file__))
     filedict = {
         "yolox-s": "yolox_s.py",

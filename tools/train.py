@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 # Copyright (c) Megvii, Inc. and its affiliates.
 import sys
-sys.path.append(r'E:\\Program\\YOLOX')
+sys.path.append(r'/home/liuhongyu/Projects/YOLOX')
 import argparse
 import random
 import warnings
@@ -104,13 +104,10 @@ def main(exp, args):
 
 if __name__ == "__main__":
     args = make_parser().parse_args()
-    print(args.exp_file, args.name)
     exp = get_exp(args.exp_file, args.name)
     exp.merge(args.opts)
-    exit()
     num_gpu = torch.cuda.device_count() if args.devices is None else args.devices
     assert num_gpu <= torch.cuda.device_count()
-
     dist_url = "auto" if args.dist_url is None else args.dist_url
     launch(
         main, num_gpu, args.num_machine, backend=args.dist_backend,

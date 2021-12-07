@@ -28,7 +28,8 @@ class YOLOX(nn.Module):
     def forward(self, x, targets=None):
         # fpn output content features of [dark3, dark4, dark5]
         fpn_outs = self.backbone(x)
-
+        # 模型在默认情况下是train模型，所以model.training为True
+        # 模型在eval情况下，model.training为False
         if self.training:
             assert targets is not None
             loss, iou_loss, conf_loss, cls_loss, l1_loss, num_fg = self.head(
