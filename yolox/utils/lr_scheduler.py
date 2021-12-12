@@ -69,6 +69,7 @@ class LRScheduler:
             semi_iters = self.iters_per_epoch_semi * (
                 self.total_epochs - self.semi_epoch - self.no_aug_epochs
             )
+            # functools.partial：返回一个新的 部分对象，当被调用时其行为类似于 func 附带位置参数 args 和关键字参数 keywords 被调用。
             lr_func = partial(
                 yolox_semi_warm_cos_lr,
                 self.lr,

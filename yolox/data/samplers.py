@@ -78,6 +78,8 @@ class InfiniteSampler(Sampler):
 
     def __iter__(self):
         start = self._rank
+        # itertools.islice：创建一个迭代器，返回从 iterable 里选中的元素。如果 start 不是0，跳过 iterable 中的元素，直到到达 start 这个位置
+        # 其中的参数step为self._world_size
         yield from itertools.islice(
             self._infinite_indices(), start, None, self._world_size
         )
@@ -87,7 +89,8 @@ class InfiniteSampler(Sampler):
         g.manual_seed(self._seed)
         while True:
             if self._shuffle:
-                yield from torch.randperm(self._size, generator=g)
+                # torch.randperm：Returns a random permutation of integers from 0 to n - 1
+                yield from torch.randperm(self._size, generator=g)  # generator – a pseudorandom number generator for sampling
             else:
                 yield from torch.arange(self._size)
 
