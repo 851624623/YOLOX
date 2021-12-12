@@ -13,7 +13,7 @@ from torch.nn import Module
 
 from yolox.utils import LRScheduler
 
-
+#  ABCMeta是用于实现抽象类的一个基础类。我们抽象出一个基类，知道要有哪些方法，但只是抽象方法，并不实现功能，只能继承，而不能被实例化，但子类必须要实现该方法。
 class BaseExp(metaclass=ABCMeta):
     """Basic class for any experiment.
     """
@@ -24,7 +24,7 @@ class BaseExp(metaclass=ABCMeta):
         self.print_interval = 100
         self.eval_interval = 10
 
-    @abstractmethod
+    @abstractmethod  # 强制子类实现父类中指定的一个方法
     def get_model(self) -> Module:
         pass
 
@@ -54,6 +54,8 @@ class BaseExp(metaclass=ABCMeta):
 
     def __repr__(self):
         table_header = ["keys", "values"]
+        # vars() 函数返回对象object的属性和属性值的字典对象。
+        # pprint.pformat() 函数会以字符串形式，返回列表或字典中的内容。
         exp_table = [
             (str(k), pprint.pformat(v)) for k, v in vars(self).items() if not k.startswith("_")
         ]

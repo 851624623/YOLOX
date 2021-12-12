@@ -2553,3 +2553,75 @@ Traceback (most recent call last):
            └ <module 'torch' from '/home/liuhongyu/anaconda3/envs/yolox/lib/python3.8/site-packages/torch/__init__.py'>
 
 RuntimeError: CUDA out of memory. Tried to allocate 50.00 MiB (GPU 0; 10.92 GiB total capacity; 9.48 GiB already allocated; 69.31 MiB free; 9.58 GiB reserved in total by PyTorch) If reserved memory is >> allocated memory try setting max_split_size_mb to avoid fragmentation.  See documentation for Memory Management and PYTORCH_CUDA_ALLOC_CONF
+2021-12-12 16:06:43.641 | INFO     | yolox.core.trainer:before_train:124 - args: Namespace(batch_size=64, ckpt=None, devices=1, dist_backend='nccl', dist_url=None, exp_file=None, experiment_name='yolox_s', fp16=True, local_rank=0, machine_rank=0, name='yolox-s', num_machine=1, occumpy=True, opts=[], resume=False, start_epoch=None)
+2021-12-12 16:06:43.642 | INFO     | yolox.core.trainer:before_train:125 - exp value:
+╒══════════════════╤════════════════════════════╕
+│ keys             │ values                     │
+╞══════════════════╪════════════════════════════╡
+│ seed             │ None                       │
+├──────────────────┼────────────────────────────┤
+│ output_dir       │ './YOLOX_outputs'          │
+├──────────────────┼────────────────────────────┤
+│ print_interval   │ 10                         │
+├──────────────────┼────────────────────────────┤
+│ eval_interval    │ 10                         │
+├──────────────────┼────────────────────────────┤
+│ num_classes      │ 80                         │
+├──────────────────┼────────────────────────────┤
+│ depth            │ 0.33                       │
+├──────────────────┼────────────────────────────┤
+│ width            │ 0.5                        │
+├──────────────────┼────────────────────────────┤
+│ data_num_workers │ 4                          │
+├──────────────────┼────────────────────────────┤
+│ input_size       │ (640, 640)                 │
+├──────────────────┼────────────────────────────┤
+│ random_size      │ (14, 26)                   │
+├──────────────────┼────────────────────────────┤
+│ train_ann        │ 'instances_train2017.json' │
+├──────────────────┼────────────────────────────┤
+│ val_ann          │ 'instances_val2017.json'   │
+├──────────────────┼────────────────────────────┤
+│ degrees          │ 10.0                       │
+├──────────────────┼────────────────────────────┤
+│ translate        │ 0.1                        │
+├──────────────────┼────────────────────────────┤
+│ scale            │ (0.1, 2)                   │
+├──────────────────┼────────────────────────────┤
+│ mscale           │ (0.8, 1.6)                 │
+├──────────────────┼────────────────────────────┤
+│ shear            │ 2.0                        │
+├──────────────────┼────────────────────────────┤
+│ perspective      │ 0.0                        │
+├──────────────────┼────────────────────────────┤
+│ enable_mixup     │ True                       │
+├──────────────────┼────────────────────────────┤
+│ warmup_epochs    │ 5                          │
+├──────────────────┼────────────────────────────┤
+│ max_epoch        │ 300                        │
+├──────────────────┼────────────────────────────┤
+│ warmup_lr        │ 0                          │
+├──────────────────┼────────────────────────────┤
+│ basic_lr_per_img │ 0.00015625                 │
+├──────────────────┼────────────────────────────┤
+│ scheduler        │ 'yoloxwarmcos'             │
+├──────────────────┼────────────────────────────┤
+│ no_aug_epochs    │ 15                         │
+├──────────────────┼────────────────────────────┤
+│ min_lr_ratio     │ 0.05                       │
+├──────────────────┼────────────────────────────┤
+│ ema              │ True                       │
+├──────────────────┼────────────────────────────┤
+│ weight_decay     │ 0.0005                     │
+├──────────────────┼────────────────────────────┤
+│ momentum         │ 0.9                        │
+├──────────────────┼────────────────────────────┤
+│ exp_name         │ 'yolox_s'                  │
+├──────────────────┼────────────────────────────┤
+│ test_size        │ (640, 640)                 │
+├──────────────────┼────────────────────────────┤
+│ test_conf        │ 0.01                       │
+├──────────────────┼────────────────────────────┤
+│ nmsthre          │ 0.65                       │
+╘══════════════════╧════════════════════════════╛
+2021-12-12 16:06:43.762 | INFO     | yolox.core.trainer:before_train:130 - Model Summary: Params: 8.97M, Gflops: 26.81

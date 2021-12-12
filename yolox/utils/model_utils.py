@@ -14,7 +14,11 @@ __all__ = [
 
 
 def get_model_info(model, tsize):
-
+    '''
+    FLOPS：注意全大写，是floating point operations per second的缩写，意指每秒浮点运算次数，理解为计算速度。是一个衡量硬件性能的指标。
+    FLOPs：注意s小写，是floating point operations的缩写（s表复数），意指浮点运算数，理解为计算量。可以用来衡量算法/模型的复杂度。
+    https://www.zhihu.com/question/65305385
+    '''
     stride = 64
     img = torch.zeros((1, 3, stride, stride), device=next(model.parameters()).device)
     flops, params = profile(deepcopy(model), inputs=(img,), verbose=False)

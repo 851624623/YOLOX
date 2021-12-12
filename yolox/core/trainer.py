@@ -131,9 +131,10 @@ class Trainer:
         model.to(self.device)
 
         # solver related init
-        self.optimizer = self.exp.get_optimizer(self.args.batch_size)
+        self.optimizer = self.exp.get_optimizer(self.args.batch_size)  # 用的SGD
 
         if self.amp_training:
+            # amp文档https://nvidia.github.io/apex/amp.html
             model, optimizer = amp.initialize(model, self.optimizer, opt_level="O1")
 
         # value of epoch will be set in `resume_train`

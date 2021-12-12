@@ -12,4 +12,5 @@ class Exp(MyExp):
         super(Exp, self).__init__()
         self.depth = 0.33
         self.width = 0.50
+        # os.path.split接路径的话，类似于os.path.basename()
         self.exp_name = os.path.split(os.path.realpath(__file__))[1].split(".")[0]

@@ -21,10 +21,12 @@ def _find_free_port():
     Find an available port of current machine / node.
     """
     import socket
-
+    # 这是解释https://blog.csdn.net/u010624263/article/details/84194470
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # Binding to port 0 will cause the OS to find an available port for us
+    #  portBinding to 0 will cause the OS to find an available port for us
+    # 把名字和套接字相关联，调用bind()后，就为socket套接字关联了一个相应的地址与端口号，即发送到地址值该端口的数据可通过socket读取和使用。
     sock.bind(("", 0))
+    # 获取本地套接口的名字，包括它的IP和端口
     port = sock.getsockname()[1]
     sock.close()
     # NOTE: there is still a chance the port could be taken by other processes.
@@ -46,6 +48,7 @@ def launch(
         args (tuple): arguments passed to main_func
     """
     world_size = num_machines * num_gpus_per_machine
+    # 单机多卡
     if world_size > 1:
         # https://github.com/pytorch/pytorch/pull/14391
         # TODO prctl in spawned processes
@@ -64,6 +67,7 @@ def launch(
             ),
             daemon=False,
         )
+    # 多机多卡
     else:
         main_func(*args)
 

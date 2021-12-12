@@ -76,7 +76,7 @@ class Exp(BaseExp):
             self.model = YOLOX(backbone, head)
 
         self.model.apply(init_yolo)
-        self.model.head.initialize_biases(1e-2)
+        self.model.head.initialize_biases(1e-2)  # 设置cls_preds和obj_preds的bias
         return self.model
 
     def get_data_loader(self, batch_size, is_distributed, no_aug=False):

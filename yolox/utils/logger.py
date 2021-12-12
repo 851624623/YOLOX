@@ -75,15 +75,17 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="a"):
         "<level>{level: <8}</level> | "
         "<cyan>{name}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>"
     )
-
+    # remove：Remove a previously added handler and stop sending logs to its sink 类似初始化的功能
     logger.remove()
     save_file = os.path.join(save_dir, filename)
     if mode == "o" and os.path.exists(save_file):
         os.remove(save_file)
     # only keep logger in rank0 process
+    # enqueue：Whether the messages to be logged should first pass through a multiprocess-safe queue before reaching the sink. 
+    # 接上一行：This is useful while logging to a file through multiple processes. This also has the advantage of making logging calls non-blocking
     if distributed_rank == 0:
         logger.add(
-            sys.stderr,
+            sys.stderr,  # 用于重定向错误信息至某个文件
             format=loguru_format,
             level="INFO",
             enqueue=True,

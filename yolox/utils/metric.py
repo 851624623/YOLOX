@@ -112,7 +112,7 @@ class MeterBuffer(defaultdict):
     def update(self, values=None, **kwargs):
         if values is None:
             values = {}
-        values.update(kwargs)
+        values.update(kwargs)  # 将一个字典与另一个字典或可遍历的键-值对合并。如果键没有出现在d1中，则d2的键值对被添加到d1中。如果键值已经出现在d1中，那么d1中对应的键值将被更新为d2的值。
         for k, v in values.items():
             self[k].update(v)
 
