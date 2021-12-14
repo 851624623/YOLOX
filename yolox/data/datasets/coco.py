@@ -43,8 +43,8 @@ class COCODataset(Dataset):
         self.coco = COCO(os.path.join(self.data_dir, "annotations", self.json_file))
         self.ids = self.coco.getImgIds()
         self.class_ids = sorted(self.coco.getCatIds())
-        cats = self.coco.loadCats(self.coco.getCatIds())
-        self._classes = tuple([c["name"] for c in cats])
+        cats = self.coco.loadCats(self.coco.getCatIds())  # 类别
+        self._classes = tuple([c["name"] for c in cats])  # 所有类别名字
         self.name = name
         self.img_size = img_size
         self.preproc = preproc
