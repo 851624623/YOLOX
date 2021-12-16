@@ -21,9 +21,11 @@ def get_exp_by_file(exp_file):
 
 def get_exp_by_name(exp_name):
     import yolox
+
     # yolox.__file__:/home/liuhongyu/Projects/YOLOX/yolox/__init__.py
     # 文件夹后面接.__file__，得到***/__init__.py；如果是py文件后面接.__file__，就得到该py文件的绝对路径
     yolox_path = os.path.dirname(os.path.dirname(yolox.__file__)) # 得到项目的绝对路径
+
     filedict = {
         "yolox-s": "yolox_s.py",
         "yolox-m": "yolox_m.py",
@@ -47,7 +49,9 @@ def get_exp(exp_file, exp_name):
         exp_file (str): file path of experiment.
         exp_name (str): name of experiment. "yolo-s",
     """
-    assert exp_file is not None or exp_name is not None, "plz provide exp file or exp name."
+    assert (
+        exp_file is not None or exp_name is not None
+    ), "plz provide exp file or exp name."
     if exp_file is not None:
         return get_exp_by_file(exp_file)
     else:

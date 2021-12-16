@@ -7,26 +7,16 @@ from copy import deepcopy
 import torch
 import torch.nn as nn
 
+__all__ = ["ModelEMA", "is_parallel"]
+
 
 def is_parallel(model):
     """check if model is in parallel mode."""
-    import apex
-
     parallel_type = (
         nn.parallel.DataParallel,
         nn.parallel.DistributedDataParallel,
-        apex.parallel.distributed.DistributedDataParallel,
     )
     return isinstance(model, parallel_type)
-
-
-def copy_attr(a, b, include=(), exclude=()):
-    # Copy attributes from b to a, options to only include [...] and to exclude [...]
-    for k, v in b.__dict__.items():
-        if (len(include) and k not in include) or k.startswith("_") or k in exclude:
-            continue
-        else:
-            setattr(a, k, v)
 
 
 class ModelEMA:
@@ -39,6 +29,7 @@ class ModelEMA:
     This class is sensitive where it is initialized in the sequence of model init,
     GPU assignment and distributed training wrappers.
     """
+
     def __init__(self, model, decay=0.9999, updates=0):
         """
         Args:
@@ -67,7 +58,3 @@ class ModelEMA:
                 if v.dtype.is_floating_point:
                     v *= d
                     v += (1.0 - d) * msd[k].detach()
-
-    def update_attr(self, model, include=(), exclude=("process_group", "reducer")):
-        # Update EMA attributes
-        copy_attr(self.ema, model, include, exclude)

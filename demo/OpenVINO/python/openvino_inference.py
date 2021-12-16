@@ -119,9 +119,7 @@ def main():
     # ---------------------------Step 6. Prepare input---------------------------------------------------------------------
     origin_img = cv2.imread(args.input)
     _, _, h, w = net.input_info[input_blob].input_data.shape
-    mean = (0.485, 0.456, 0.406)
-    std = (0.229, 0.224, 0.225)
-    image, ratio = preprocess(origin_img, (h, w), mean, std)
+    image, ratio = preprocess(origin_img, (h, w))
 
     # ---------------------------Step 7. Do inference----------------------------------------------------------------------
     log.info('Starting inference in synchronous mode')
@@ -141,15 +139,16 @@ def main():
     boxes_xyxy[:, 2] = boxes[:, 0] + boxes[:, 2]/2.
     boxes_xyxy[:, 3] = boxes[:, 1] + boxes[:, 3]/2.
     boxes_xyxy /= ratio
-    dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.65, score_thr=0.1)
+    dets = multiclass_nms(boxes_xyxy, scores, nms_thr=0.45, score_thr=0.1)
 
-    final_boxes = dets[:, :4]
-    final_scores, final_cls_inds = dets[:, 4], dets[:, 5]
-    origin_img = vis(origin_img, final_boxes, final_scores, final_cls_inds,
-                     conf=args.score_thr, class_names=COCO_CLASSES)
+    if dets is not None:
+        final_boxes = dets[:, :4]
+        final_scores, final_cls_inds = dets[:, 4], dets[:, 5]
+        origin_img = vis(origin_img, final_boxes, final_scores, final_cls_inds,
+                         conf=args.score_thr, class_names=COCO_CLASSES)
 
     mkdir(args.output_dir)
-    output_path = os.path.join(args.output_dir, args.image_path.split("/")[-1])
+    output_path = os.path.join(args.output_dir, args.input.split("/")[-1])
     cv2.imwrite(output_path, origin_img)
 
 
