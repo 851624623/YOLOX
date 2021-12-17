@@ -137,7 +137,6 @@ class Trainer:
         # solver related init
         self.optimizer = self.exp.get_optimizer(self.args.batch_size)  # 用的SGD
 
-
         # value of epoch will be set in `resume_train`
         model = self.resume_train(model)
 

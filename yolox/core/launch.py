@@ -59,7 +59,7 @@ def launch(
         args (tuple): arguments passed to main_func
     """
     world_size = num_machines * num_gpus_per_machine
-    # 单机多卡
+    # 单机多卡或多机多卡
     if world_size > 1:
         # https://github.com/pytorch/pytorch/pull/14391
         # TODO prctl in spawned processes
@@ -72,6 +72,7 @@ def launch(
             dist_url = f"tcp://127.0.0.1:{port}"
 
         start_method = "spawn"
+        # vars() 函数返回对象object的属性和属性值的字典对象
         cache = vars(args[1]).get("cache", False)
 
         # To use numpy memmap for caching image into RAM, we have to use fork method
@@ -97,7 +98,7 @@ def launch(
             daemon=False,
             start_method=start_method,
         )
-    # 多机多卡
+    # 单机单卡
     else:
         main_func(*args)
 

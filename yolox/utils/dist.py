@@ -43,6 +43,7 @@ def get_num_devices():
     if gpu_list is not None:
         return len(gpu_list.split(','))
     else:
+        # os.popen() 方法用于从一个命令打开一个管道。函数返回一个file对象，里面的内容是脚本输出的内容
         devices_list_info = os.popen("nvidia-smi -L")
         devices_list_info = devices_list_info.read().strip().split("\n")
         return len(devices_list_info)

@@ -81,11 +81,12 @@ def make_parser():
         action="store_true",
         help="occupy GPU memory first for training.",
     )
+    # 只能改自身的一些属性，eg:python tools/train.py -n yolox-s -d 8 -b 64 --fp16 width 3 depth 5
     parser.add_argument(
         "opts",
         help="Modify config options using the command-line",
         default=None,
-        nargs=argparse.REMAINDER,
+        nargs=argparse.REMAINDER,  # 可选参数必须在这之前
     )
     return parser
 

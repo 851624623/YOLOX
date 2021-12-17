@@ -86,7 +86,7 @@ def setup_logger(save_dir, distributed_rank=0, filename="log.txt", mode="a"):
     # 接上一行：This is useful while logging to a file through multiple processes. This also has the advantage of making logging calls non-blocking
     if distributed_rank == 0:
         logger.add(
-            sys.stderr,  # 用于重定向错误信息至某个文件
+            sys.stderr,  # 设置了控制台的输出格式
             format=loguru_format,
             level="INFO",
             enqueue=True,
