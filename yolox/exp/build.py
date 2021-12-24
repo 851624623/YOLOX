@@ -6,6 +6,9 @@ import importlib
 import os
 import sys
 
+# yolox.__file__:/home/liuhongyu/Projects/YOLOX/yolox/__init__.py
+# 文件夹后面接.__file__，得到***/__init__.py；如果是py文件后面接.__file__，就得到该py文件的绝对路径
+# yolox_path = os.path.dirname(os.path.dirname(yolox.__file__))
 
 def get_exp_by_file(exp_file):
     try:
@@ -20,27 +23,13 @@ def get_exp_by_file(exp_file):
 
 
 def get_exp_by_name(exp_name):
-    import yolox
-
-    # yolox.__file__:/home/liuhongyu/Projects/YOLOX/yolox/__init__.py
-    # 文件夹后面接.__file__，得到***/__init__.py；如果是py文件后面接.__file__，就得到该py文件的绝对路径
-    yolox_path = os.path.dirname(os.path.dirname(yolox.__file__)) # 得到项目的绝对路径
-
-    filedict = {
-        "yolox-s": "yolox_s.py",
-        "yolox-m": "yolox_m.py",
-        "yolox-l": "yolox_l.py",
-        "yolox-x": "yolox_x.py",
-        "yolox-tiny": "yolox_tiny.py",
-        "yolox-nano": "nano.py",
-        "yolov3": "yolov3.py",
-    }
-    filename = filedict[exp_name]
-    exp_path = os.path.join(yolox_path, "exps", "default", filename)
-    return get_exp_by_file(exp_path)
+    exp = exp_name.replace("-", "_")  # convert string like "yolox-s" to "yolox_s"
+    module_name = ".".join(["yolox", "exp", "default", exp])
+    exp_object = importlib.import_module(module_name).Exp()
+    return exp_object
 
 
-def get_exp(exp_file, exp_name):
+def get_exp(exp_file=None, exp_name=None):
     """
     get Exp object by file or name. If exp_file and exp_name
     are both provided, get Exp by exp_file.
