@@ -154,6 +154,7 @@ class VOCDetection(Dataset):
             logger.info(
                 "Caching images for the first time. This might take about 3 minutes for VOC"
             )
+            # np.memmap为存储在磁盘上的二进制文件中的数组创建内存映射
             self.imgs = np.memmap(
                 cache_file,
                 shape=(len(self.ids), max_h, max_w, 3),
