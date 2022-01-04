@@ -14,6 +14,7 @@ def vis(img, boxes, scores, cls_ids, conf=0.5, class_names=None):
         box = boxes[i]
         cls_id = int(cls_ids[i])
         score = scores[i]
+        # 做nms之前那一步，已经通过mask过滤掉了
         if score < conf:
             continue
         x0 = int(box[0])
