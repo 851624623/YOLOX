@@ -105,6 +105,6 @@ def replace_module(module, replaced_module_type, new_module_type, replace_func=N
         for name, child in module.named_children():
             new_child = replace_module(child, replaced_module_type, new_module_type)
             if new_child is not child:  # child is already replaced
-                model.add_module(name, new_child)
+                model.add_module(name, new_child) # 因为name相同，所以相当于直接把child换成new_child
 
     return model

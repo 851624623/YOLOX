@@ -77,6 +77,7 @@ def main():
     if "model" in ckpt:
         ckpt = ckpt["model"]
     model.load_state_dict(ckpt)
+    # onnx转不了nn.SiLU, 用SiLU替换
     model = replace_module(model, nn.SiLU, SiLU)
     model.head.decode_in_inference = False
 
