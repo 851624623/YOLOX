@@ -100,7 +100,7 @@ class Dataset(torchDataset):
             ...     def __getitem__(self, index):
             ...         return self.enable_mosaic
         """
-
+        # https://www.cnblogs.com/zhuzl/p/11203905.html
         @wraps(getitem_fn)
         def wrapper(self, index):
             if not isinstance(index, int):

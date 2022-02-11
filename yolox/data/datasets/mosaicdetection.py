@@ -15,6 +15,7 @@ from .datasets_wrapper import Dataset
 
 def get_mosaic_coordinate(mosaic_image, mosaic_index, xc, yc, w, h, input_h, input_w):
     # TODO update doc
+    # 图片往(xc, yc)方向偏
     # index0 to top left part of image
     if mosaic_index == 0:
         x1, y1, x2, y2 = max(xc - w, 0), max(yc - h, 0), xc, yc
