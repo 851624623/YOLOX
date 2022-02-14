@@ -15,7 +15,7 @@ from .datasets_wrapper import Dataset
 
 def get_mosaic_coordinate(mosaic_image, mosaic_index, xc, yc, w, h, input_h, input_w):
     # TODO update doc
-    # 图片往(xc, yc)方向偏
+    # 图片往中点(xc, yc)方向偏
     # index0 to top left part of image
     if mosaic_index == 0:
         x1, y1, x2, y2 = max(xc - w, 0), max(yc - h, 0), xc, yc
@@ -202,10 +202,12 @@ class MosaicDetection(Dataset):
         padded_img[:origin_h, :origin_w] = cp_img
 
         x_offset, y_offset = 0, 0
+        # 这两个判断说明origin_h > target_h, origin_w > target_w
         if padded_img.shape[0] > target_h:
             y_offset = random.randint(0, padded_img.shape[0] - target_h - 1)
         if padded_img.shape[1] > target_w:
             x_offset = random.randint(0, padded_img.shape[1] - target_w - 1)
+        # padded_cropped_img的shape为（target_h, target_w, 3）
         padded_cropped_img = padded_img[
             y_offset: y_offset + target_h, x_offset: x_offset + target_w
         ]
