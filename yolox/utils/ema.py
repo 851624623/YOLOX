@@ -54,6 +54,7 @@ class ModelEMA:
             msd = (
                 model.module.state_dict() if is_parallel(model) else model.state_dict()
             )  # model state_dict
+            # 每次的msd[k].detach()是新的权重
             for k, v in self.ema.state_dict().items():
                 if v.dtype.is_floating_point:
                     v *= d

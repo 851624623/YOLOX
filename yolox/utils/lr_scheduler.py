@@ -100,7 +100,7 @@ def cos_lr(lr, total_iters, iters):
     lr *= 0.5 * (1.0 + math.cos(math.pi * iters / total_iters))
     return lr
 
-
+# iters指目前是第几个iter
 def warm_cos_lr(lr, total_iters, warmup_total_iters, warmup_lr_start, iters):
     """Cosine learning rate with warm up."""
     if iters <= warmup_total_iters:
