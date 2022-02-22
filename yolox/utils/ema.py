@@ -49,6 +49,7 @@ class ModelEMA:
         # Update EMA parameters
         with torch.no_grad():
             self.updates += 1
+            # 开始阶段，新模型更新的较快，原模型权重占比小
             d = self.decay(self.updates)
 
             msd = (
