@@ -171,6 +171,21 @@ def _pad_to_largest_tensor(tensor, group):
         torch.zeros([1], dtype=torch.int64, device=tensor.device)
         for _ in range(world_size)
     ]
+    '''
+    >>> # All tensors below are of torch.int64 dtype.
+    >>> # We have 2 process groups, 2 ranks.
+    >>> tensor_list = [torch.zeros(2, dtype=torch.int64) for _ in range(2)]
+    >>> tensor_list
+        [tensor([0, 0]), tensor([0, 0])] # Rank 0 and 1
+    >>> tensor = torch.arange(2, dtype=torch.int64) + 1 + 2 * rank
+    >>> tensor
+        tensor([1, 2]) # Rank 0
+        tensor([3, 4]) # Rank 1
+    >>> dist.all_gather(tensor_list, tensor)
+    >>> tensor_list
+        [tensor([1, 2]), tensor([3, 4])] # Rank 0
+        [tensor([1, 2]), tensor([3, 4])] # Rank 1
+    '''
     dist.all_gather(size_list, local_size, group=group)
     size_list = [int(size.item()) for size in size_list]
 

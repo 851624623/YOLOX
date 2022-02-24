@@ -189,7 +189,10 @@ class COCOEvaluator:
         statistics = torch.cuda.FloatTensor([inference_time, nms_time, n_samples])
         if distributed:
             data_list = gather(data_list, dst=0)
+            # itertools.chain相当于迭代器，不占内存
             data_list = list(itertools.chain(*data_list))
+            # reduce 收集所有设备的input_tensor并使用指定的reduce操作（例如求和，均值等）进行缩减。最终结果放置在dst设备上。
+            # all_reduce 与reduce操作相同，但最终结果被复制到所有设备。
             torch.distributed.reduce(statistics, dst=0)
 
         eval_results = self.evaluate_prediction(data_list, statistics)

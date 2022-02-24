@@ -219,9 +219,9 @@ class Trainer:
         # log needed information
         if (self.iter + 1) % self.exp.print_interval == 0:
             # TODO check ETA logic
-            left_iters = self.max_iter * self.max_epoch - (self.progress_in_iter + 1)
+            left_iters = self.max_iter * self.max_epoch - (self.progress_in_iter + 1) # 剩下的iter数
             eta_seconds = self.meter["iter_time"].global_avg * left_iters
-            eta_str = "ETA: {}".format(datetime.timedelta(seconds=int(eta_seconds)))
+            eta_str = "ETA: {}".format(datetime.timedelta(seconds=int(eta_seconds))) # 剩余的时间
 
             progress_str = "epoch: {}/{}, iter: {}/{}".format(
                 self.epoch + 1, self.max_epoch, self.iter + 1, self.max_iter

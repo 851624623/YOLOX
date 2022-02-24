@@ -65,7 +65,7 @@ def all_reduce(py_dict, op="sum", group=None):
         py_dict (dict): dict to apply all reduce op.
         op (str): operator, could be "sum" or "mean".
     """
-    world_size = get_world_size()
+    world_size = get_world_size() # 返回全局的整个的进程数
     if world_size == 1:
         return py_dict
     if group is None:
@@ -87,6 +87,7 @@ def all_reduce(py_dict, op="sum", group=None):
     if op == "mean":
         flatten_tensor /= world_size
 
+    # torch.split(tensor, split_size_or_sections, dim=0)
     split_tensors = [
         x.reshape(shape)
         for x, shape in zip(torch.split(flatten_tensor, tensor_numels), tensor_shapes)

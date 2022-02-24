@@ -179,7 +179,7 @@ class Exp(BaseExp):
 
         if is_distributed:
             dist.barrier()
-            dist.broadcast(tensor, 0)
+            dist.broadcast(tensor, 0) # 将rank=0上的数据，广播到所有rank上
 
         input_size = (tensor[0].item(), tensor[1].item())
         return input_size
