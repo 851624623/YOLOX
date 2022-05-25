@@ -80,6 +80,7 @@ class InfiniteSampler(Sampler):
         while True:
             if self._shuffle:
                 # torch.randperm：Returns a random permutation of integers from 0 to n - 1
+                # 因为seed不变，所以生成的结果每次都不变
                 yield from torch.randperm(self._size, generator=g)  # generator – a pseudorandom number generator for sampling
             else:
                 yield from torch.arange(self._size)

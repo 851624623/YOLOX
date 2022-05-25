@@ -107,7 +107,7 @@ class Exp(BaseExp):
 
         local_rank = get_local_rank()
 
-        with wait_for_the_master(local_rank):
+        with wait_for_the_master(local_rank):  # 每个local_rank都会实例化一次
             dataset = COCODataset(
                 data_dir=self.data_dir,
                 json_file=self.train_ann,
