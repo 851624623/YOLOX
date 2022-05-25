@@ -73,5 +73,8 @@ class BaseExp(metaclass=ABCMeta):
                     try:
                         v = src_type(v)
                     except Exception:
+                        # This can be used for safely evaluating strings containing Python values from untrusted sources 
+                        # without the need to parse the values oneself. It is not capable of evaluating arbitrarily complex expressions, 
+                        # for example involving operators or indexing.
                         v = ast.literal_eval(v)
                 setattr(self, k, v)

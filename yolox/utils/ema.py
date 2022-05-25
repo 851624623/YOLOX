@@ -49,11 +49,13 @@ class ModelEMA:
         # Update EMA parameters
         with torch.no_grad():
             self.updates += 1
+            # 开始阶段，新模型更新的较快，原模型权重占比小
             d = self.decay(self.updates)
 
             msd = (
                 model.module.state_dict() if is_parallel(model) else model.state_dict()
             )  # model state_dict
+            # 每次的msd[k].detach()是新的权重
             for k, v in self.ema.state_dict().items():
                 if v.dtype.is_floating_point:
                     v *= d

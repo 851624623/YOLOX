@@ -150,16 +150,16 @@ class YOLOXHead(nn.Module):
         for k, (cls_conv, reg_conv, stride_this_level, x) in enumerate(
             zip(self.cls_convs, self.reg_convs, self.strides, xin)
         ):
-            x = self.stems[k](x)
+            x = self.stems[k](x) # 把通道统一了
             cls_x = x
             reg_x = x
 
             cls_feat = cls_conv(cls_x)
-            cls_output = self.cls_preds[k](cls_feat)
+            cls_output = self.cls_preds[k](cls_feat) # 1*1
 
             reg_feat = reg_conv(reg_x)
-            reg_output = self.reg_preds[k](reg_feat)
-            obj_output = self.obj_preds[k](reg_feat)
+            reg_output = self.reg_preds[k](reg_feat) # 1*1
+            obj_output = self.obj_preds[k](reg_feat) # 1*1
 
             if self.training:
                 output = torch.cat([reg_output, obj_output, cls_output], 1)

@@ -33,6 +33,8 @@ class DataPrefetcher:
             self.next_target = self.next_target.cuda(non_blocking=True)
 
     def next(self):
+        # Synchronizes with another stream. 用来同步self.stream
+        # All future work submitted to this stream will wait until all kernels submitted to a given stream at the time of call complete.
         torch.cuda.current_stream().wait_stream(self.stream)
         input = self.next_input
         target = self.next_target
@@ -48,4 +50,5 @@ class DataPrefetcher:
 
     @staticmethod
     def _record_stream_for_image(input):
+        # https://pytorch.org/docs/stable/generated/torch.Tensor.record_stream.html?highlight=record_stream#torch.Tensor.record_stream
         input.record_stream(torch.cuda.current_stream())

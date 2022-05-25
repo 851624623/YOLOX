@@ -35,6 +35,7 @@ class Exp(BaseExp):
         self.data_dir = None
         self.train_ann = "instances_train2017.json"
         self.val_ann = "instances_val2017.json"
+        self.test_ann = "instances_test2017.json"
 
         # --------------- transform config ----------------- #
         self.mosaic_prob = 1.0
@@ -54,7 +55,7 @@ class Exp(BaseExp):
         self.warmup_lr = 0
         self.basic_lr_per_img = 0.01 / 64.0
         self.scheduler = "yoloxwarmcos"
-        self.no_aug_epochs = 15  # 最后15epoch不适用数据增强
+        self.no_aug_epochs = 15  # 最后15epoch不使用数据增强
         self.min_lr_ratio = 0.05
         self.ema = True
 
@@ -178,7 +179,7 @@ class Exp(BaseExp):
 
         if is_distributed:
             dist.barrier()
-            dist.broadcast(tensor, 0)
+            dist.broadcast(tensor, 0) # 将rank=0上的数据，广播到所有rank上
 
         input_size = (tensor[0].item(), tensor[1].item())
         return input_size
@@ -242,7 +243,7 @@ class Exp(BaseExp):
 
         valdataset = COCODataset(
             data_dir=self.data_dir,
-            json_file=self.val_ann if not testdev else "image_info_test-dev2017.json",
+            json_file=self.val_ann if not testdev else self.test_ann,
             name="val2017" if not testdev else "test2017",
             img_size=self.test_size,
             preproc=ValTransform(legacy=legacy),

@@ -88,6 +88,7 @@ def make_parser():
 
 def get_image_list(path):
     image_names = []
+    # maindir 是表示目录路径的字符串。subdir 是 dirpath 中子目录名称组成的列表。filenames 是 dirpath 中非目录文件名称组成的列表。
     for maindir, subdir, file_name_list in os.walk(path):
         for filename in file_name_list:
             apath = os.path.join(maindir, filename)
@@ -247,6 +248,7 @@ def main(exp, args):
     vis_folder = None
     if args.save_result:
         vis_folder = os.path.join(file_name, "vis_res")
+        # 如果 exist_ok 为 False (默认值)，则如果目标目录已存在将引发 FileExistsError。
         os.makedirs(vis_folder, exist_ok=True)
 
     if args.trt:

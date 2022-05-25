@@ -15,6 +15,7 @@ from .datasets_wrapper import Dataset
 
 def get_mosaic_coordinate(mosaic_image, mosaic_index, xc, yc, w, h, input_h, input_w):
     # TODO update doc
+    # 图片往中点(xc, yc)方向偏
     # index0 to top left part of image
     if mosaic_index == 0:
         x1, y1, x2, y2 = max(xc - w, 0), max(yc - h, 0), xc, yc
@@ -163,6 +164,7 @@ class MosaicDetection(Dataset):
         jit_factor = random.uniform(*self.mixup_scale)
         FLIP = random.uniform(0, 1) > 0.5
         cp_labels = []
+        # 防止图片没有对应的标签
         while len(cp_labels) == 0:
             cp_index = random.randint(0, self.__len__() - 1)
             cp_labels = self._dataset.load_anno(cp_index)
@@ -198,17 +200,21 @@ class MosaicDetection(Dataset):
         padded_img = np.zeros(
             (max(origin_h, target_h), max(origin_w, target_w), 3), dtype=np.uint8
         )
+        # 如果origin_h > target_h, origin_w > target_w, padded_img = cp_img
+        # 如果origin_h < target_h, origin_w < target_w, cp_img在padded_img的左上角
         padded_img[:origin_h, :origin_w] = cp_img
 
         x_offset, y_offset = 0, 0
+        # 进入这两个判断，说明origin_h > target_h, origin_w > target_w, 取和origin_img一样大的cp_img
         if padded_img.shape[0] > target_h:
             y_offset = random.randint(0, padded_img.shape[0] - target_h - 1)
         if padded_img.shape[1] > target_w:
             x_offset = random.randint(0, padded_img.shape[1] - target_w - 1)
+        # padded_cropped_img的shape为（target_h, target_w, 3）
         padded_cropped_img = padded_img[
             y_offset: y_offset + target_h, x_offset: x_offset + target_w
         ]
-
+        # 这步就是按照缩放的比例，调整label
         cp_bboxes_origin_np = adjust_box_anns(
             cp_labels[:, :4].copy(), cp_scale_ratio, 0, 0, origin_w, origin_h
         )

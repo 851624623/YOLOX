@@ -153,7 +153,7 @@ def preproc(img, input_size, swap=(2, 0, 1)):
         (int(img.shape[1] * r), int(img.shape[0] * r)),
         interpolation=cv2.INTER_LINEAR,
     ).astype(np.uint8)
-    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img
+    padded_img[: int(img.shape[0] * r), : int(img.shape[1] * r)] = resized_img  # 图片放左上角
 
     padded_img = padded_img.transpose(swap)
     padded_img = np.ascontiguousarray(padded_img, dtype=np.float32)
@@ -190,11 +190,11 @@ class TrainTransform:
         # boxes [xyxy] 2 [cx,cy,w,h]
         boxes = xyxy2cxcywh(boxes)
         boxes *= r_
-
+        # 判断框的w, h长度，做mask
         mask_b = np.minimum(boxes[:, 2], boxes[:, 3]) > 1
         boxes_t = boxes[mask_b]
         labels_t = labels[mask_b]
-
+        # 如果框的w, h长度都不大于1，就用原来的没做过mirror和hsv增强的图片
         if len(boxes_t) == 0:
             image_t, r_o = preproc(image_o, input_dim)
             boxes_o *= r_o
@@ -203,8 +203,9 @@ class TrainTransform:
 
         labels_t = np.expand_dims(labels_t, 1)
 
-        targets_t = np.hstack((labels_t, boxes_t))
+        targets_t = np.hstack((labels_t, boxes_t))  # 横着拼起来
         padded_labels = np.zeros((self.max_labels, 5))
+        # 限制到max_labels指定的数量
         padded_labels[range(len(targets_t))[: self.max_labels]] = targets_t[
             : self.max_labels
         ]
@@ -237,6 +238,7 @@ class ValTransform:
     # assume input is cv2 img for now
     def __call__(self, img, res, input_size):
         img, _ = preproc(img, input_size, self.swap)
+        # 为什么不做归一化呢
         if self.legacy:
             img = img[::-1, :, :].copy()
             img /= 255.0
