@@ -11,9 +11,9 @@ from loguru import logger
 import torch
 import torch.backends.cudnn as cudnn
 
-from yolox.core import Trainer, launch
-from yolox.exp import get_exp
-from yolox.utils import configure_nccl, configure_omp, get_num_devices
+from yolox.core import launch
+from yolox.exp import Exp, get_exp
+from yolox.utils import configure_module, configure_nccl, configure_omp, get_num_devices
 
 
 def make_parser():
@@ -83,6 +83,13 @@ def make_parser():
     )
     # 只能改自身的一些属性，eg:python tools/train.py -n yolox-s -d 8 -b 64 --fp16 width 3 depth 5
     parser.add_argument(
+        "-l",
+        "--logger",
+        type=str,
+        help="Logger to be used for metrics",
+        default="tensorboard"
+    )
+    parser.add_argument(
         "opts",
         help="Modify config options using the command-line",
         default=None,
@@ -92,7 +99,7 @@ def make_parser():
 
 
 @logger.catch
-def main(exp, args):
+def main(exp: Exp, args):
     if exp.seed is not None:
         random.seed(exp.seed)
         torch.manual_seed(exp.seed)
@@ -108,11 +115,12 @@ def main(exp, args):
     configure_omp()
     cudnn.benchmark = True
 
-    trainer = Trainer(exp, args)
+    trainer = exp.get_trainer(args)
     trainer.train()
 
 
 if __name__ == "__main__":
+    configure_module()
     args = make_parser().parse_args()
     exp = get_exp(args.exp_file, args.name)
     exp.merge(args.opts)
