@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
 # Copyright (c) Megvii, Inc. and its affiliates.
-
+import sys
+sys.path.append("/home/liuhongyu/Projects/YOLOX")
 import argparse
 import os
 import time
@@ -247,12 +248,12 @@ def main(exp, args):
         args.experiment_name = exp.exp_name
 
     file_name = os.path.join(exp.output_dir, args.experiment_name)
+    # 如果 exist_ok 为 False (默认值)，则如果目标目录已存在将引发 FileExistsError。
     os.makedirs(file_name, exist_ok=True)
 
     vis_folder = None
     if args.save_result:
         vis_folder = os.path.join(file_name, "vis_res")
-        # 如果 exist_ok 为 False (默认值)，则如果目标目录已存在将引发 FileExistsError。
         os.makedirs(vis_folder, exist_ok=True)
 
     if args.trt:

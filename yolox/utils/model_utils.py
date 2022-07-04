@@ -63,7 +63,7 @@ def fuse_conv_and_bn(conv: nn.Conv2d, bn: nn.BatchNorm2d) -> nn.Conv2d:
     )
 
     # prepare filters
-    w_conv = conv.weight.clone().view(conv.out_channels, -1)
+    w_conv = conv.weight.clone().view(conv.out_channels, -1)  # (out_channel, in_channel, kernel, kernel) -> (out_channel, in_channel*kernel*kernel)
     w_bn = torch.diag(bn.weight.div(torch.sqrt(bn.eps + bn.running_var)))
     fusedconv.weight.copy_(torch.mm(w_bn, w_conv).view(fusedconv.weight.shape))
 
