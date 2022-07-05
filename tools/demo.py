@@ -149,15 +149,17 @@ class Predictor(object):
 
         img, _ = self.preproc(img, None, self.test_size)
         img = torch.from_numpy(img).unsqueeze(0)
-        img = img.float()
+        img = img.float()  # self.float() is equivalent to self.to(torch.float32)
         if self.device == "gpu":
             img = img.cuda()
             if self.fp16:
+                # self.half() is equivalent to self.to(torch.float16)
                 img = img.half()  # to FP16
 
         with torch.no_grad():
             t0 = time.time()
             outputs = self.model(img)
+            # self.decoder在非trt模式下，为None
             if self.decoder is not None:
                 outputs = self.decoder(outputs, dtype=outputs.type())
             outputs = postprocess(

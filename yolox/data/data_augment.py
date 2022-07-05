@@ -236,8 +236,7 @@ class ValTransform:
     # assume input is cv2 img for now
     def __call__(self, img, res, input_size):
         img, _ = preproc(img, input_size, self.swap)
-        # 为什么不做归一化呢
-        if self.legacy:
+        if self.legacy:  # 新模型不需要标准化
             img = img[::-1, :, :].copy()
             img /= 255.0
             img -= np.array([0.485, 0.456, 0.406]).reshape(3, 1, 1)
