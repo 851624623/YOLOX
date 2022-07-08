@@ -205,6 +205,8 @@ def image_demo(predictor, vis_folder, path, current_time, save_result):
             save_file_name = os.path.join(save_folder, os.path.basename(image_name))
             logger.info("Saving detection result in {}".format(save_file_name))
             cv2.imwrite(save_file_name, result_image)
+        # it returns the code of the pressed key or -1 if no key was pressed before the specified time had elapsed
+        # The function only works if there is at least one HighGUI window created and the window is active
         ch = cv2.waitKey(0)
         if ch == 27 or ch == ord("q") or ch == ord("Q"):
             break
@@ -236,7 +238,9 @@ def imageflow_demo(predictor, vis_folder, current_time, args):
             if args.save_result:
                 vid_writer.write(result_frame)
             else:
+                # If a window with the same name already exists, the function does nothing.
                 cv2.namedWindow("yolox", cv2.WINDOW_NORMAL)
+                # If the window was not created before this function, it is assumed creating a window with cv::WINDOW_AUTOSIZE.
                 cv2.imshow("yolox", result_frame)
             ch = cv2.waitKey(1)
             if ch == 27 or ch == ord("q") or ch == ord("Q"):
