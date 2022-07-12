@@ -63,10 +63,10 @@ class COCODataset(Dataset):
 
         self.coco = COCO(os.path.join(self.data_dir, "annotations", self.json_file))
         remove_useless_info(self.coco)
-        self.ids = self.coco.getImgIds()
-        self.class_ids = sorted(self.coco.getCatIds())
-        self.cats = self.coco.loadCats(self.coco.getCatIds()) # 类别
-        self._classes = tuple([c["name"] for c in self.cats]) # 所有类别名字
+        self.ids = self.coco.getImgIds()  # 图片id
+        self.class_ids = sorted(self.coco.getCatIds())  # 类别id
+        self.cats = self.coco.loadCats(self.coco.getCatIds())  # 类别中的所有信息
+        self._classes = tuple([c["name"] for c in self.cats])  # 所有类别名字
         self.imgs = None
         self.name = name
         self.img_size = img_size
@@ -99,6 +99,8 @@ class COCODataset(Dataset):
             logger.info(
                 "Caching images for the first time. This might take about 20 minutes for COCO"
             )
+            # Create a memory-map to an array stored in a binary file on disk.
+            # Memory-mapped files are used for accessing small segments of large files on disk.
             self.imgs = np.memmap(
                 cache_file,
                 shape=(len(self.ids), max_h, max_w, 3),
@@ -109,6 +111,7 @@ class COCODataset(Dataset):
             from multiprocessing.pool import ThreadPool
 
             NUM_THREADs = min(8, os.cpu_count())
+            # imap 该方法将可迭代对象分割为许多块（这个块大小跟线程数无关），然后提交给线程池/进程池
             loaded_images = ThreadPool(NUM_THREADs).imap(
                 lambda x: self.load_resized_img(x),
                 range(len(self.annotations)),

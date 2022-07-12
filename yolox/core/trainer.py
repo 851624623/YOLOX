@@ -294,6 +294,7 @@ class Trainer:
             # resume the model/optimizer state dict
             model.load_state_dict(ckpt["model"])
             self.optimizer.load_state_dict(ckpt["optimizer"])
+            # pop(key[, default]) 如果key存在于字典中则将其移除并返回其值，否则返回default
             self.best_ap = ckpt.pop("best_ap", 0)
             # resume the training states variables
             start_epoch = (
