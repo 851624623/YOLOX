@@ -23,6 +23,7 @@ class YoloBatchSampler(torchBatchSampler):
         self.mosaic = mosaic
 
     def __iter__(self):
+        # super().__iter__()是父类的
         for batch in super().__iter__():
             yield [(self.mosaic, idx) for idx in batch]
 
@@ -66,7 +67,9 @@ class InfiniteSampler(Sampler):
             self._rank = rank
             self._world_size = world_size
 
-    def __iter__(self):
+    # If a container object’s __iter__() method is implemented as a generator, it will automatically return an iterator object (technically, 
+    # a generator object) supplying the __iter__() and __next__() methods.
+    def __iter__(self):  # Return the iterator object itself. 就是一个迭代器
         start = self._rank
         # itertools.islice：创建一个迭代器，返回从 iterable 里选中的元素。如果 start 不是0，跳过 iterable 中的元素，直到到达 start 这个位置
         # 其中的参数step为self._world_size
