@@ -135,6 +135,7 @@ def yolox_warm_cos_lr(
         lr = (lr - warmup_lr_start) * pow(
             iters / float(warmup_total_iters), 2
         ) + warmup_lr_start
+    # no_aug情况
     elif iters >= total_iters - no_aug_iter:
         lr = min_lr
     else:

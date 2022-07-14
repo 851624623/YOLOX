@@ -98,6 +98,7 @@ class Trainer:
         inps = inps.to(self.data_type)
         targets = targets.to(self.data_type)
         targets.requires_grad = False
+        # input、target缩放
         inps, targets = self.exp.preprocess(inps, targets, self.input_size)
         data_end_time = time.time()
 
@@ -168,6 +169,7 @@ class Trainer:
 
         if self.use_model_ema:
             self.ema_model = ModelEMA(model, 0.9998)
+            # self.start_epoch在self.resume_train()设置
             self.ema_model.updates = self.max_iter * self.start_epoch
 
         self.model = model
@@ -278,7 +280,7 @@ class Trainer:
                 self.train_loader, self.epoch, self.rank, self.is_distributed
             )
 
-    @property
+    @property  # 在类中把方法变成属性调用
     def progress_in_iter(self):
         return self.epoch * self.max_iter + self.iter
 
