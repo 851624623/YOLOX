@@ -40,6 +40,9 @@ def get_async_norm_states(module):
 
 def pyobj2tensor(pyobj, device="cuda"):
     """serialize picklable python object to tensor"""
+    # 一个torch.Storage是一个单一数据类型的连续一维数组。
+    # 每个torch.Tensor都有一个对应的、相同数据类型的存储。
+    # https://www.bbsmax.com/A/amd0LD7kdg/
     storage = torch.ByteStorage.from_buffer(pickle.dumps(pyobj))
     return torch.ByteTensor(storage).to(device=device)
 
@@ -83,7 +86,8 @@ def all_reduce(py_dict, op="sum", group=None):
     tensor_numels = [py_dict[k].numel() for k in py_key]
 
     flatten_tensor = torch.cat([py_dict[k].flatten() for k in py_key])
-    dist.all_reduce(flatten_tensor, op=_get_reduce_op(op))
+    # Reduces the tensor data across all machines in such a way that all get the final result.
+    dist.all_reduce(flatten_tensor, op=_get_reduce_op(op)) # _get_reduce_op里面都是dist.ReduceOp.SUM，所以后面要除以world_size
     if op == "mean":
         flatten_tensor /= world_size
 
