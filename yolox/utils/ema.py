@@ -41,7 +41,7 @@ class ModelEMA:
         self.ema = deepcopy(model.module if is_parallel(model) else model).eval()
         self.updates = updates
         # decay exponential ramp (to help early epochs)
-        self.decay = lambda x: decay * (1 - math.exp(-x / 2000))
+        self.decay = lambda x: decay * (1 - math.exp(-x / 2000))  # x增大，1 - math.exp(-x / 2000)整体增大
         for p in self.ema.parameters():
             p.requires_grad_(False)
 

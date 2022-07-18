@@ -210,6 +210,7 @@ class COCODataset(Dataset):
 
         return img, res.copy(), img_info, np.array([id_])
 
+    # 一个修饰符就是一个函数，它将被修饰的函数做为参数，并返回修饰后的同名函数或其它可调用的东西。
     @Dataset.mosaic_getitem
     def __getitem__(self, index):
         """
