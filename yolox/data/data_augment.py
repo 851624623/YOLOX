@@ -20,7 +20,7 @@ from yolox.utils import xyxy2cxcywh
 
 def augment_hsv(img, hgain=5, sgain=30, vgain=30):
     hsv_augs = np.random.uniform(-1, 1, 3) * [hgain, sgain, vgain]  # random gains
-    hsv_augs *= np.random.randint(0, 2, 3)  # random selection of h, s, v
+    hsv_augs *= np.random.randint(0, 2, 3)  # random selection of h, s, v   0 or 1
     hsv_augs = hsv_augs.astype(np.int16)
     img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV).astype(np.int16)
 
@@ -167,7 +167,7 @@ class TrainTransform:
     def __call__(self, image, targets, input_dim):
         boxes = targets[:, :4].copy()
         labels = targets[:, 4].copy()
-        if len(boxes) == 0:
+        if len(boxes) == 0:  # 没有object
             targets = np.zeros((self.max_labels, 5), dtype=np.float32)
             image, r_o = preproc(image, input_dim)
             return image, targets
@@ -188,11 +188,11 @@ class TrainTransform:
         # boxes [xyxy] 2 [cx,cy,w,h]
         boxes = xyxy2cxcywh(boxes)
         boxes *= r_
-        # 判断框的w, h长度，做mask
+        # 判断框的w, h长度，做mask，去除有问题的标签
         mask_b = np.minimum(boxes[:, 2], boxes[:, 3]) > 1
         boxes_t = boxes[mask_b]
         labels_t = labels[mask_b]
-        # 如果框的w, h长度都不大于1，就用原来的没做过mirror和hsv增强的图片
+        # 如果框的w, h长度都不大于1，就用原来的没做过mirror和hsv增强的图片和标签
         if len(boxes_t) == 0:
             image_t, r_o = preproc(image_o, input_dim)
             boxes_o *= r_o
