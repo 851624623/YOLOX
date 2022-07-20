@@ -17,6 +17,7 @@ def get_mosaic_coordinate(mosaic_image, mosaic_index, xc, yc, w, h, input_h, inp
     # TODO update doc
     # 图片往中点(xc, yc)方向偏
     # index0 to top left part of image
+    # small_coord后续用来截img
     if mosaic_index == 0:
         x1, y1, x2, y2 = max(xc - w, 0), max(yc - h, 0), xc, yc
         small_coord = w - (x2 - x1), h - (y2 - y1), w, h
@@ -214,7 +215,7 @@ class MosaicDetection(Dataset):
         padded_cropped_img = padded_img[
             y_offset: y_offset + target_h, x_offset: x_offset + target_w
         ]
-        # 这步就是按照缩放的比例，调整label
+        # 这步就是按照jit_factor的比例，调整label。cp_bboxes_origin_np对应的是padded_img
         cp_bboxes_origin_np = adjust_box_anns(
             cp_labels[:, :4].copy(), cp_scale_ratio, 0, 0, origin_w, origin_h
         )
@@ -223,6 +224,7 @@ class MosaicDetection(Dataset):
                 origin_w - cp_bboxes_origin_np[:, 0::2][:, ::-1]
             )
         cp_bboxes_transformed_np = cp_bboxes_origin_np.copy()
+        # 根据x_offset、y_offset，调整label。cp_bboxes_transformed_np对应的是padded_cropped_img
         cp_bboxes_transformed_np[:, 0::2] = np.clip(
             cp_bboxes_transformed_np[:, 0::2] - x_offset, 0, target_w
         )

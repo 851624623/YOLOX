@@ -59,7 +59,7 @@ def get_affine_matrix(
     if scale <= 0.0:
         raise ValueError("Argument scale should be positive")
 
-    R = cv2.getRotationMatrix2D(angle=angle, center=(0, 0), scale=scale)
+    R = cv2.getRotationMatrix2D(center=(0, 0), angle=angle, scale=scale)
 
     M = np.ones([2, 3])
     # Shear
@@ -88,6 +88,7 @@ def apply_affine_to_bboxes(targets, target_size, M, scale):
     corner_points[:, :2] = targets[:, [0, 1, 2, 3, 0, 3, 2, 1]].reshape(
         4 * num_gts, 2
     )  # x1y1, x2y2, x1y2, x2y1
+    # @和matmul是一样的
     corner_points = corner_points @ M.T  # apply affine transform
     corner_points = corner_points.reshape(num_gts, 8)
 
