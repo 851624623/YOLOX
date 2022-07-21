@@ -164,7 +164,8 @@ class TrainTransform:
         self.max_labels = max_labels
         self.flip_prob = flip_prob
         self.hsv_prob = hsv_prob
-
+    
+    # label从__getitem__里得到的[x1, y1, x2, y2, cls]，转为[cls, c_x, c_y, w, h]
     def __call__(self, image, targets, input_dim):
         boxes = targets[:, :4].copy()
         labels = targets[:, 4].copy()

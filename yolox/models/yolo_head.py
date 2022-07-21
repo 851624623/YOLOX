@@ -168,6 +168,7 @@ class YOLOXHead(nn.Module):
                 )
                 x_shifts.append(grid[:, :, 0])
                 y_shifts.append(grid[:, :, 1])
+                # grid shape [1, hsize * wsize, 2)]
                 expanded_strides.append(
                     torch.zeros(1, grid.shape[1])
                     .fill_(stride_this_level)
@@ -188,7 +189,7 @@ class YOLOXHead(nn.Module):
                 output = torch.cat(
                     [reg_output, obj_output.sigmoid(), cls_output.sigmoid()], 1
                 )
-
+            # output [batch_size, n_anchors * hsize * wsize, n_ch]
             outputs.append(output)
 
         if self.training:
@@ -228,8 +229,11 @@ class YOLOXHead(nn.Module):
         output = output.permute(0, 1, 3, 4, 2).reshape(
             batch_size, self.n_anchors * hsize * wsize, -1
         )
+        # shape [1, 1 * hsize * wsize, 2]
         grid = grid.view(1, -1, 2)
+        # cx, cy
         output[..., :2] = (output[..., :2] + grid) * stride
+        # w, h
         output[..., 2:4] = torch.exp(output[..., 2:4]) * stride
         return output, grid
 
@@ -266,6 +270,8 @@ class YOLOXHead(nn.Module):
         cls_preds = outputs[:, :, 5:]  # [batch, n_anchors_all, n_cls]
 
         # calculate targets
+        # labels shape [batch, num_objs, 5]
+        # 先检查[cls, cx, cy, w, h]不为0的情况，结果得到[batch, num_objs]，再统计num_objs维度上，不为False的个数。即实际label的个数
         nlabel = (labels.sum(dim=2) > 0).sum(dim=1)  # number of objects
 
         total_num_anchors = outputs.shape[1]
@@ -288,6 +294,7 @@ class YOLOXHead(nn.Module):
             num_gt = int(nlabel[batch_idx])
             num_gts += num_gt
             if num_gt == 0:
+                # new_zeros：Returns a Tensor of size size filled with 0. By default, the returned Tensor has the same torch.dtype and torch.device as this tensor.
                 cls_target = outputs.new_zeros((0, self.num_classes))
                 reg_target = outputs.new_zeros((0, 4))
                 l1_target = outputs.new_zeros((0, 4))
@@ -298,6 +305,8 @@ class YOLOXHead(nn.Module):
                 gt_classes = labels[batch_idx, :num_gt, 0]
                 bboxes_preds_per_image = bbox_preds[batch_idx]
 
+                # What does "noqa" mean ?
+                # It used to be "nopep8" but when Flake8 and Pep8 wanted a common qualifier @florentx suggested "NoQA" as in "No Quality Assurance" (iirc) and it stuck.
                 try:
                     (
                         gt_matched_classes,
