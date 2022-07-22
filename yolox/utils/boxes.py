@@ -88,6 +88,7 @@ def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
         area_a = torch.prod(bboxes_a[:, 2:] - bboxes_a[:, :2], 1)
         area_b = torch.prod(bboxes_b[:, 2:] - bboxes_b[:, :2], 1)
     else:
+        # bboxes_a[:, None, :2] shape [n_gt, 1, 2], bboxes_b[:, :2] shape [n_anchors_all过滤后的个数, 2]
         tl = torch.max(
             (bboxes_a[:, None, :2] - bboxes_a[:, None, 2:] / 2),
             (bboxes_b[:, :2] - bboxes_b[:, 2:] / 2),
@@ -96,7 +97,7 @@ def bboxes_iou(bboxes_a, bboxes_b, xyxy=True):
             (bboxes_a[:, None, :2] + bboxes_a[:, None, 2:] / 2),
             (bboxes_b[:, :2] + bboxes_b[:, 2:] / 2),
         )
-
+        # torch.prod：Returns the product of all elements in the input tensor.
         area_a = torch.prod(bboxes_a[:, 2:], 1)
         area_b = torch.prod(bboxes_b[:, 2:], 1)
     en = (tl < br).type(tl.type()).prod(dim=2)

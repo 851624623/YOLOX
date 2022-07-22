@@ -203,7 +203,7 @@ class TrainTransform:
 
         labels_t = np.expand_dims(labels_t, 1)
 
-        targets_t = np.hstack((labels_t, boxes_t))  # 横着拼起来
+        targets_t = np.hstack((labels_t, boxes_t))  # 横着拼起来 [cls, cx, cy, w, h]
         padded_labels = np.zeros((self.max_labels, 5))
         # 限制到max_labels指定的数量
         padded_labels[range(len(targets_t))[: self.max_labels]] = targets_t[

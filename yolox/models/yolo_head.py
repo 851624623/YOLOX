@@ -483,6 +483,7 @@ class YOLOXHead(nn.Module):
 
         pair_wise_ious = bboxes_iou(gt_bboxes_per_image, bboxes_preds_per_image, False)
 
+        # [n_gt, bboxes_preds_per_image.shape[0], num_classes]
         gt_cls_per_image = (
             F.one_hot(gt_classes.to(torch.int64), self.num_classes)
             .float()
@@ -541,9 +542,9 @@ class YOLOXHead(nn.Module):
         total_num_anchors,
         num_gt,
     ):
-        expanded_strides_per_image = expanded_strides[0]
-        x_shifts_per_image = x_shifts[0] * expanded_strides_per_image
-        y_shifts_per_image = y_shifts[0] * expanded_strides_per_image
+        expanded_strides_per_image = expanded_strides[0]  # n_anchors_all
+        x_shifts_per_image = x_shifts[0] * expanded_strides_per_image  # n_anchors_all
+        y_shifts_per_image = y_shifts[0] * expanded_strides_per_image  # n_anchors_all
         x_centers_per_image = (
             (x_shifts_per_image + 0.5 * expanded_strides_per_image)
             .unsqueeze(0)
@@ -554,7 +555,7 @@ class YOLOXHead(nn.Module):
             .unsqueeze(0)
             .repeat(num_gt, 1)
         )
-
+        # gt_bboxes_per_image [n_gt, 4], gt_bboxes_per_image_* [n_gt, n_anchors_all]
         gt_bboxes_per_image_l = (
             (gt_bboxes_per_image[:, 0] - 0.5 * gt_bboxes_per_image[:, 2])
             .unsqueeze(1)
@@ -580,14 +581,15 @@ class YOLOXHead(nn.Module):
         b_r = gt_bboxes_per_image_r - x_centers_per_image
         b_t = y_centers_per_image - gt_bboxes_per_image_t
         b_b = gt_bboxes_per_image_b - y_centers_per_image
-        bbox_deltas = torch.stack([b_l, b_t, b_r, b_b], 2)
-
+        bbox_deltas = torch.stack([b_l, b_t, b_r, b_b], 2)  # [num_gt, n_anchors_all, 4]
+        # 找出b_l, b_r, b_t, b_b中都大于0的，即x/y_centers_per_image都在真实框里面的情况
         is_in_boxes = bbox_deltas.min(dim=-1).values > 0.0
+        # 判断这张图上所有的obj在这个坐标点是否有对应的b_l, b_r, b_t, b_b
         is_in_boxes_all = is_in_boxes.sum(dim=0) > 0
         # in fixed center
 
         center_radius = 2.5
-
+        # 根据center_radius和gt的cx, cy，构建的新的boxes
         gt_bboxes_per_image_l = (gt_bboxes_per_image[:, 0]).unsqueeze(1).repeat(
             1, total_num_anchors
         ) - center_radius * expanded_strides_per_image.unsqueeze(0)
