@@ -483,7 +483,7 @@ class YOLOXHead(nn.Module):
 
         pair_wise_ious = bboxes_iou(gt_bboxes_per_image, bboxes_preds_per_image, False)
 
-        # [n_gt, bboxes_preds_per_image.shape[0], num_classes]
+        # [n_gt, num_in_boxes_anchor, num_classes]
         gt_cls_per_image = (
             F.one_hot(gt_classes.to(torch.int64), self.num_classes)
             .float()
@@ -494,17 +494,18 @@ class YOLOXHead(nn.Module):
 
         if mode == "cpu":
             cls_preds_, obj_preds_ = cls_preds_.cpu(), obj_preds_.cpu()
-
+        # cls_preds_/obj_preds_  shape [num_in_boxes_anchor, num_classes]
         with torch.cuda.amp.autocast(enabled=False):
             cls_preds_ = (
                 cls_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
                 * obj_preds_.float().unsqueeze(0).repeat(num_gt, 1, 1).sigmoid_()
             )
+            # 这里将得到的cls_preds_开根号
             pair_wise_cls_loss = F.binary_cross_entropy(
                 cls_preds_.sqrt_(), gt_cls_per_image, reduction="none"
             ).sum(-1)
         del cls_preds_
-
+        # 对is_in_boxes_and_center取反, True->False, False->True
         cost = (
             pair_wise_cls_loss
             + 3.0 * pair_wise_ious_loss
@@ -584,7 +585,7 @@ class YOLOXHead(nn.Module):
         bbox_deltas = torch.stack([b_l, b_t, b_r, b_b], 2)  # [num_gt, n_anchors_all, 4]
         # 找出b_l, b_r, b_t, b_b中都大于0的，即x/y_centers_per_image都在真实框里面的情况
         is_in_boxes = bbox_deltas.min(dim=-1).values > 0.0
-        # 判断这张图上所有的obj在这个坐标点是否有对应的b_l, b_r, b_t, b_b
+        # 判断这张图上所有的obj在当前坐标点是否有对应的b_l, b_r, b_t, b_b。坐标点指n_anchors_all个格子
         is_in_boxes_all = is_in_boxes.sum(dim=0) > 0
         # in fixed center
 
@@ -612,8 +613,10 @@ class YOLOXHead(nn.Module):
         is_in_centers_all = is_in_centers.sum(dim=0) > 0
 
         # in boxes and in centers
+        # boxes_anchor在in_boxes_all或者in_centers_all的情况
         is_in_boxes_anchor = is_in_boxes_all | is_in_centers_all
 
+        # 两种情况的交集
         is_in_boxes_and_center = (
             is_in_boxes[:, is_in_boxes_anchor] & is_in_centers[:, is_in_boxes_anchor]
         )
@@ -626,10 +629,14 @@ class YOLOXHead(nn.Module):
 
         ious_in_boxes_matrix = pair_wise_ious
         n_candidate_k = min(10, ious_in_boxes_matrix.size(1))
+        # 通过计算的IoU找出最大top n_candidate_k的数据
         topk_ious, _ = torch.topk(ious_in_boxes_matrix, n_candidate_k, dim=1)
+        # 统计每个目标分配的候选框数量， 至少保证存在一个正样本的候选框
         dynamic_ks = torch.clamp(topk_ious.sum(1).int(), min=1)
         dynamic_ks = dynamic_ks.tolist()
         for gt_idx in range(num_gt):
+            # 根据每个gt分配的候选框数量num=dynamic_ks[gt_idx]，由cost找出前num最小cost的位置，作为分配的候选框
+            # cost越小，和gt越匹配
             _, pos_idx = torch.topk(
                 cost[gt_idx], k=dynamic_ks[gt_idx], largest=False
             )
@@ -638,13 +645,19 @@ class YOLOXHead(nn.Module):
         del topk_ious, dynamic_ks, pos_idx
 
         anchor_matching_gt = matching_matrix.sum(0)
+        # 过滤掉共用的候选框，同一grid、不同gt中有多个1的情况，即某个grid中候选框被多个真实框关联
         if (anchor_matching_gt > 1).sum() > 0:
             _, cost_argmin = torch.min(cost[:, anchor_matching_gt > 1], dim=0)
+            # 被多个真实框关联的某grid中候选框对应的值全部置为0
             matching_matrix[:, anchor_matching_gt > 1] *= 0
+            # 将损失最小的那个候选框置为1
             matching_matrix[cost_argmin, anchor_matching_gt > 1] = 1
+        # 每个grid求和并找出大于0的grid，说明这个grid存在候选框（此时每个grid最多一个候选框）
         fg_mask_inboxes = matching_matrix.sum(0) > 0
+        # 候选框个数
         num_fg = fg_mask_inboxes.sum().item()
 
+        # 把通过标签分配处理的mask,赋值给初筛选的mask
         fg_mask[fg_mask.clone()] = fg_mask_inboxes
 
         matched_gt_inds = matching_matrix[:, fg_mask_inboxes].argmax(0)

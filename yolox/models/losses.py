@@ -42,7 +42,9 @@ class IOUloss(nn.Module):
                 (pred[:, :2] + pred[:, 2:] / 2), (target[:, :2] + target[:, 2:] / 2)
             )
             area_c = torch.prod(c_br - c_tl, 1)
+            # clamp用来防止分母为0
             giou = iou - (area_c - area_u) / area_c.clamp(1e-16)
+            # clamp用来限制giou最大最小值，giou的取值范围就是（-1, 1）
             loss = 1 - giou.clamp(min=-1.0, max=1.0)
 
         if self.reduction == "mean":
