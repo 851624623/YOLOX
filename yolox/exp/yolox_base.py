@@ -78,6 +78,9 @@ class Exp(BaseExp):
         # name of LRScheduler
         self.scheduler = "yoloxwarmcos"
         # last #epoch to close augmention like mosaic
+        # Mosaic might cause your data distribution away from the ground truth distribution 
+        # (e. g. : an in-house scene and a scence outside might concat in one image). 
+        # So turning off mosaic augmentation at the end of training might help to get a better performance
         self.no_aug_epochs = 15  # 最后15epoch不使用数据增强
         # apply EMA during training
         self.ema = True

@@ -400,6 +400,9 @@ class YOLOXHead(nn.Module):
         loss_iou = (
             self.iou_loss(bbox_preds.view(-1, 4)[fg_masks], reg_targets)
         ).sum() / num_fg
+        # cls and reg loss only care about foreground, but objectness affect both foreground area and background area
+        # Q: Why the obj loss is scaled by the number of foreground samples rather than the number of total samples?
+        # A: To make the loss more stable and your training process could be more smooth
         loss_obj = (
             self.bcewithlog_loss(obj_preds.view(-1, 1), obj_targets)
         ).sum() / num_fg
